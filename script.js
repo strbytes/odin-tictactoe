@@ -13,6 +13,15 @@ const Board = function() {
     status.textContent = "X goes first!"
   }
   
+  const isFull = function() {
+    for (let i = 0; i < 9; i++) {
+      if (!getTile(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
   const tileListener = function(e) {
     g.playTurn(parseInt(e.currentTarget.id));
   }
@@ -39,7 +48,7 @@ const Board = function() {
     tiles[t].removeEventListener('click', tileListener);
   }
 
-  return {clear, getTile, setTile};
+  return {clear, isFull, getTile, setTile};
 }();
 
 const Game = function() {
@@ -76,6 +85,11 @@ const Game = function() {
           newGame();
         }
         return winner;
+      }
+      if (Board.isFull()) {
+        status.textContent = 'Draw!';
+        newGame();
+        return 'no one';
       }
     }
   }
