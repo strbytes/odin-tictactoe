@@ -1,8 +1,20 @@
+const tiles = document.querySelectorAll(".tile");
+const status = document.querySelector("#status");
+
 const Board = function() {
   const gameboard = [];
   
   const clear = function() {
     gameboard.splice(0, gameboard.length);
+    [...tiles].forEach((tile) => {
+      tile.className = "tile";
+      tile.addEventListener('click', tileListener)
+    })
+    status.textContent = "X goes first!"
+  }
+  
+  const tileListener = function(e) {
+    g.playTurn(parseInt(e.currentTarget.id));
   }
 
   const inRange = function(t) {
@@ -23,38 +35,16 @@ const Board = function() {
       throw `tile ${t} has already been played`;
     }
     gameboard[t] = val;
+    tiles[t].classList.add(val);
+    tiles[t].removeEventListener('click', tileListener);
   }
 
-  const checkWin = function() {
-    const winStates = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
-                       [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                       [0, 4, 8], [2, 4, 6]];
-    for (const state of winStates) {
-      if (gameboard[state[0]] === gameboard[state[1]] &&
-        gameboard[state[1]] === gameboard[state[2]]) {
-        return gameboard[state[0]];
-      }
-    }
-  }
-
-  return {clear, getTile, setTile, checkWin};
+  return {clear, getTile, setTile};
 }();
-
-const Player = function(side) {
-  const playTurn = function(pos) {
-    Board.setTile(pos, side);
-  }
-  
-  const getSide = function() {
-    return side;
-  }
-  
-  return {playTurn, getSide}
-}
 
 const Game = function() {
   Board.clear();
-  const players = [Player("x"), Player("y")];
+  const players = ["x", "o"];
   
   let turn = 0;
   
@@ -63,15 +53,44 @@ const Game = function() {
   }
   
   const playTurn = function(pos) {
-    if (gameOver()) {
-      throw `game is over, ${Board.checkWin()} won`
+    if (over()) {
+      throw `game is over, ${over()} won`;
     }
-    players[turn % 2].playTurn(pos);
+    Board.setTile(pos, players[turn % 2]);
+    turn += 1;
+    if (!over()) {
+      status.textContent = `${whoseTurn().toUpperCase()}, it's your turn!`;
+    }
   }
   
-  const gameOver = function() {
-    return Board.checkWin() ? true : false;
+  const over = function() {
+    const winStates = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+                       [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                       [0, 4, 8], [2, 4, 6]];
+    for (const state of winStates) {
+      if (Board.getTile(state[0]) === Board.getTile(state[1]) &&
+        Board.getTile(state[1]) === Board.getTile(state[2])) {
+        let winner = Board.getTile(state[0]);
+        if (winner) {
+          status.textContent = `${winner.toUpperCase()} wins!`;
+          newGame();
+        }
+        return winner;
+      }
+    }
   }
   
-  return {whoseTurn, playTurn, gameOver};
+  const newGame = function() {
+    let newGame = document.createElement('button');
+    newGame.textContent = "New game?";
+    newGame.id = "new-game";
+    newGame.addEventListener('click', () => {
+      g = Game();
+    });
+    status.appendChild(newGame);
+  }
+
+  return {whoseTurn, playTurn, over};
 }
+
+g = Game();
