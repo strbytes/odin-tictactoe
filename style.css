@@ -1,0 +1,59 @@
+/* TODO
+ * Gameover message. 
+ * New game button. */
+
+body {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  position: fixed;
+  bottom: 70vh;
+  text-align: center;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: 12vh 12vh 12vh;
+  grid-template-rows: 12vh 12vh 12vh;
+  gap: 1vh;
+}
+
+.tile {
+  position: relative;
+  background-color: red;
+  height: 12vh;
+  width: 12vh;
+  color: yellow;
+  font-size: 12vh;
+  cursor: pointer;
+}
+
+.x, .o {
+  cursor: not-allowed;
+}
+
+.x::after, .o::after {
+  position: absolute;
+  left: 1.5vh;
+  top: 1vh;
+}
+
+.x::after {
+  content: "X";
+}
+
+.o::after {
+  content: "O";
+}
+
+#status {
+  position: fixed;
+  top: 70vh;
+  text-align: center;
+}
+
